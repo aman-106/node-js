@@ -2,6 +2,10 @@
 node js is async event driven and meant for scalable  network applications.
 light-weight 
 
+https://github.com/jscomplete/ngs
+https://github.com/jscomplete/advanced-nodejs
+https://medium.com/edge-coders/how-well-do-you-know-node-js-36b1473c01c8
+
 ## uses
 node js for microservivces and api -- js code and node env works as server
 serverless cloud -- like async function act as sever response 
@@ -200,7 +204,7 @@ production app run with cluster of nodes
  
  ## Node async patterns
  callback pattern --- callback hell
- promoise - util.primosify , 
+ promoise , using async await function - util.primosify , 
  
  ```js
  const fs = require('fs');
@@ -209,7 +213,116 @@ production app run with cluster of nodes
  const { readFile } = require('fs').promises;
  ```
  
+ ## Eevnt Emitters
  
+  Subscription shoud be before emitting the event .
+  Below code wont fire any events or should be delayed .
+  
+  allows different modules to work  without dependices
+  
+  ```js
+  const e = new Events();
+  e.emit('my-event'); // emit
+  e.on('my-event', ()=>{  // subscription
+  // to something
+  })  
+  
+ // Streams are Event Emitters
+// process.stdin, process.stdout
+```
+
+
+## working with web servers
+
+using htttp module
+```js
+const http = require('http');
+
+const server = http.createServer((req, res) => {
+  res.end('Hello World\n');
+  // or 
+  res.write('dkdkd');
+  res.end();
+});
+
+server.listen(4242, () => {
+  console.log('Server is running...');
+});
+
+```
+both request and resposne are stream and have events for different functiions
+class for 
+Request -  IncommingMessage // as a server
+Resposne - ServerResponse 
+
+htttp.clientRequest for request to http server
+
+## Operating System
+read and write to os
+
+### Os
+
+```js
+const os = require('os');
+
+console.log('OS platform:', os.platform());
+
+console.log('OS CPU architecture:', os.arch());
+
+console.log('# of logical CPU cores', os.cpus().length);
+
+console.log('Home directory for current user', os.homedir());
+
+console.log('line 1' + os.EOL + 'line 2' + os.EOL + 'line 3');
+```
+
+### fs 
+
+```js
+
+  readFile(path[, options])
+  createReadStream(path[, options])
+
+  writeFile(file, data[, options])
+  
+  ```
+  
+  ## Child Process
+  tot create sub process in OS and use result when it is done
+  
+```js
+const { spawn } = require('child_process');
+
+// Print Working Directory
+const pwd = spawn('pwd');
+pwd.stdout.pipe(process.stdout);
+
+// Read content of a file
+const { HOME } = process.env;
+const cat = spawn('cat', [`${HOME}/.bash_profile`]);
+cat.stdout.pipe(process.stdout);
+
+// List files
+const ls = spawn('ls', ['-l', '.']);
+ls.stdout.pipe(process.stdout);
+
+// Use Shell Syntax
+const shell = spawn('ls -al ~ | wc -l', { shell: true });
+shell.stdout.pipe(process.stdout);
+```
+
+###  Node debugging
+
+
+```js
+node --inspect-brk filename.js
+
+ // open 
+// chrome://inspect 
+// for debug mode for filename
+// see code wrapped in function  like console.log(arguments) will be works
+```
+
 
 
 
