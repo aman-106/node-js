@@ -92,14 +92,35 @@ ms -- is not exact time but not miniium time after blocking exuction is done.
 setINterval excutes after every ms , clearInterval(id) to clear.
 
 
-##process
+## Process
+process has event emits  , only sync code can be excuted 
+methods -exit
+```js
+process.on('exit',function(code){
+    console.log('error'+code)
+})
+process.on('uncaughtException',function(){
+    // got exception
+    process.exit(1);
+})
+
+```
 process.env
 process.argv
 // interface btw the node and os - streams
+
 process.stdin
 process.stdout
 process.stderr
 process.exit -- function
+
+Instead of dircetly process.env.PORT we can utils file for confriguration 
+utils.js
+```js
+export default const utils ={
+    PORT:process.env.PORT || 3000,
+}
+```
 ```js
 process.stdin.on('readable', () => {
   const chunk = process.stdin.read();
@@ -230,7 +251,8 @@ production app run with cluster of nodes
  // Streams are Event Emitters
 // process.stdin, process.stdout
 ```
-
+## fs 
+fs.
 
 ## working with web servers
 
@@ -276,8 +298,15 @@ console.log('Home directory for current user', os.homedir());
 console.log('line 1' + os.EOL + 'line 2' + os.EOL + 'line 3');
 ```
 
-### fs 
+## fs 
+https://nodejs.org/api/fs.html
+readFile -- path , format , callback 
 
+if **format** is missing ,
+    callback(err,**buffer**)=>{}
+else 
+    callback(err,data)=>{}
+    
 ```js
 
   readFile(path[, options])
@@ -287,7 +316,7 @@ console.log('line 1' + os.EOL + 'line 2' + os.EOL + 'line 3');
   
   ```
   
-  ## Child Process
+## Child Process
   tot create sub process in OS and use result when it is done
   
 ```js
@@ -322,6 +351,132 @@ node --inspect-brk filename.js
 // for debug mode for filename
 // see code wrapped in function  like console.log(arguments) will be works
 ```
+
+
+# Node adanced topics
+
+## Node architect ure -- VM (V8) and libuv
+
+node -v8-options | grep "in progess"
+
+v8 features - shipping , in progess and staged
+staged can be used by --harmony
+
+over view model of node js
+https://medium.com/@chathuranga94/nodejs-architecture-concurrency-model-f71da5f53d1d
+
+
+## Buffer 
+Buffer class is a subclass of the Uint8Array class
+used for binary stream of data .
+chuch of memory allocated outside V8 Heap and we put some data in that memory and that data can be interpated in different ways
+ so charcter encoding needed for buffer.
+ 
+ Buffer is low level sequnce of binary data 
+ Buffer is allocated , cant be resized .
+ 
+ \u0000 --  unicode null character.
+ ```js 
+ b = Buffer.allocUnsafe(800); // alloc existing 800 bytes of memory , which refs to previous used bytes
+  a= Buffer.alloc(800) //
+  
+ const string = 'touch';
+const buffer = Buffer.from('touch');
+// string.length, buffer.length
+5 5 
+
+const string = 'touché';
+const buffer = Buffer.from('touché'); // utf-8 encoding doesnt have this special char
+6 7 
+ ```
+ 
+ useful reading img file , compzressed file
+ 
+ https://nodejs.org/api/buffer.html#buffer_buf_slice_start_end
+ 
+ orginail_memory_reference = buffer.slice(start , end)
+ **new Buffer that references the same memory as the original, but offset and cropped by the start and end indices.**
+ 
+ 
+ ```js
+ 
+   let tag = buffer.slice(-4, -1); // contains last three bits 
+// TAG IS MEMEORY REFERNCE OR POINTER FOR 3 Byte FROM MEMORY IN BUFFER 
+  for(let i=0;i < tag.length; i++) {
+    tag[i] = '\u000';
+  }
+  
+  // CHANGINg TAG will be last 3 Byte in buffer 
+  
+  ```
+  
+  
+  when converting streams of binary data into , we should use string_decoder module 
+ 
+ The string_decoder module provides an API for decoding Buffer objects into strings in a manner that preserves encoded multi-byte UTF-8 and UTF-16 characters. It can be accessed using:
+ 
+ https://nodejs.org/api/string_decoder.html
+ 
+ 
+ ```js
+ const { StringDecoder } = require('string_decoder');
+const decoder = new StringDecoder('utf8');
+
+process.stdin.on('readable', () => {
+  const chunk = process.stdin.read();
+  if (chunk != null) {
+    const buffer = Buffer.from([chunk]);
+    console.log('With .toString():', buffer.toString());
+    console.log('With StringDecoder:', decoder.write(buffer));
+  }
+});
+```
+ 
+ 
+ ## how require works ?
+ module --global object 
+ 
+ require  -- global function to acesss modules
+ 
+ require('file-some')
+ 
+ module --
+ gives info on file like
+ {
+     id,
+     filename,
+     paths,
+     loaded,
+ }
+ 
+ node js looks for file in paths of modules unitl root folder exception for core modules
+ 
+ 
+ require resolve teh file and excute 
+ but only resolve the module 
+ 
+ 
+ require.resolve can be used for ONLY resolving not excuting.
+ require.resolve stils error if file doesnt exists.
+ used for checking package is installed or not
+  
+  
+  package json main property to set index file eg 
+  ```js
+  {
+      name:'find-me',
+      main:'start.js',
+  }
+  
+  ```
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
 
 
 
