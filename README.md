@@ -461,6 +461,11 @@ process.stdin.on('readable', () => {
  used for checking package is installed or not
   
   
+  module can be folder with index.js and can be resolved using the require .
+  
+  
+  
+  
   package json main property to set index file eg 
   ```js
   {
